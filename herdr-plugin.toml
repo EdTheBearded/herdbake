@@ -1,0 +1,37 @@
+id = "herdbake"
+name = "Herdbake"
+version = "0.2.0"
+min_herdr_version = "0.9.0"
+description = "Routes bitbake's menuconfig/devshell/ccmake terminal spawns into Herdr popups, splits, or tabs instead of external terminal windows - automatically, in any pane."
+platforms = ["linux", "macos"]
+
+[[startup]]
+command = ["scripts/inject-all.sh"]
+
+[[events]]
+on = "pane.created"
+command = ["scripts/inject-one.sh"]
+
+[[actions]]
+id = "toggle"
+title = "Herdbake: toggle auto-injection"
+contexts = ["workspace"]
+command = ["scripts/toggle.sh"]
+
+[[actions]]
+id = "status"
+title = "Herdbake: show status"
+contexts = ["workspace"]
+command = ["scripts/status.sh"]
+
+[[panes]]
+id = "terminal"
+title = "Herdbake"
+placement = "popup"
+command = ["scripts/pane-entry.sh"]
+
+[[panes]]
+id = "chooser"
+title = "Herdbake: choose split direction"
+placement = "popup"
+command = ["scripts/chooser.sh"]

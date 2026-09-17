@@ -1,0 +1,38 @@
+# herdbake default routing rules.
+#
+# Copy this file to the plugin config directory
+# (`herdr plugin config-dir herdbake`) as `bitbake-terminal.toml` to
+# override it - herdbake reads that path first and only falls back to
+# this bundled default when no override exists.
+#
+# Rules are matched top-to-bottom against the title bitbake passes via
+# `tmux new-window -n "{title}"`. The first match wins; `match` is a
+# shell-style glob (fnmatch), not a regex.
+
+[[rule]]
+name = "menuconfig"
+match = "* Configuration"
+placement = "popup"
+width = "80%"
+height = "80%"
+
+[[rule]]
+name = "devshell"
+match = "OpenEmbedded Developer*Shell"
+placement = "split"
+direction = "down"
+prompt_direction = false
+
+[[rule]]
+name = "ccmake"
+match = "* - ccmake"
+placement = "split"
+direction = "right"
+prompt_direction = true
+prompt_timeout_ms = 15000
+
+# Anything that doesn't match a rule above falls back to this.
+[default]
+placement = "split"
+direction = "down"
+prompt_direction = false
