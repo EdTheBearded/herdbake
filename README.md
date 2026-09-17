@@ -50,6 +50,14 @@ tmux usage (if you have it) is unaffected.
 ## Install
 
 ```bash
+herdr plugin install EdTheBearded/herdbake
+```
+
+For local development instead, clone the repo and link your working
+copy:
+
+```bash
+git clone https://github.com/EdTheBearded/herdbake ~/herdbake
 herdr plugin link ~/herdbake
 ```
 
@@ -140,7 +148,8 @@ next bitbake invocation; no reload needed.
 Early (v0.2) - verified end-to-end against a real Yocto/Torizon OS build
 tree: `bitbake -c menuconfig` opens a live `mconf` session inside a
 Herdr popup and completes normally when closed. Not yet run across a
-wide range of Yocto releases. Feedback and issues welcome.
+wide range of Yocto releases. Feedback and issues welcome via
+[GitHub Issues](https://github.com/EdTheBearded/herdbake/issues).
 
 ## License
 
