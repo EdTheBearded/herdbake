@@ -1,37 +1,100 @@
 id = "herdbake"
 name = "Herdbake"
-version = "0.2.0"
+version = "0.9.0"
 min_herdr_version = "0.9.0"
-description = "Routes bitbake's menuconfig/devshell/ccmake terminal spawns into Herdr popups, splits, or tabs instead of external terminal windows - automatically, in any pane."
+description = "Routes BitBake terminal spawns into compact Herdr popups instead of external terminal windows."
 platforms = ["linux", "macos"]
 
-[[startup]]
-command = ["scripts/inject-all.sh"]
-
-[[events]]
-on = "pane.created"
-command = ["scripts/inject-one.sh"]
+[[actions]]
+id = "setup"
+title = "Herdbake: set up BitBake terminal routing"
+contexts = ["workspace"]
+command = ["scripts/setup-action.sh"]
 
 [[actions]]
-id = "toggle"
-title = "Herdbake: toggle auto-injection"
+id = "help"
+title = "Herdbake: command reference"
 contexts = ["workspace"]
-command = ["scripts/toggle.sh"]
+command = ["scripts/help-action.sh"]
 
 [[actions]]
-id = "status"
-title = "Herdbake: show status"
+id = "doctor"
+title = "Herdbake: diagnose active build"
 contexts = ["workspace"]
-command = ["scripts/status.sh"]
+command = ["scripts/doctor-action.sh"]
+
+[[actions]]
+id = "failure-console"
+title = "Herdbake: open latest task log"
+contexts = ["workspace"]
+command = ["scripts/failure-console-action.sh"]
+
+[[actions]]
+id = "layers"
+title = "Herdbake: inspect layers"
+contexts = ["workspace"]
+command = ["scripts/layer-inspector-action.sh"]
+
+[[actions]]
+id = "health"
+title = "Herdbake: show build health"
+contexts = ["workspace"]
+command = ["scripts/health-action.sh"]
+
+[[actions]]
+id = "graph"
+title = "Herdbake: generate dependency graph"
+contexts = ["workspace"]
+command = ["scripts/graph-action.sh"]
+
+[[actions]]
+id = "logs"
+title = "Herdbake: navigate latest build log"
+contexts = ["workspace"]
+command = ["scripts/log-navigator-action.sh"]
+
+[[actions]]
+id = "kernel"
+title = "Herdbake: kernel configuration workflow"
+contexts = ["workspace"]
+command = ["scripts/kernel-workflow-action.sh"]
 
 [[panes]]
 id = "terminal"
 title = "Herdbake"
 placement = "popup"
+width = "88%"
+height = "82%"
 command = ["scripts/pane-entry.sh"]
 
 [[panes]]
 id = "chooser"
 title = "Herdbake: choose split direction"
 placement = "popup"
+width = "60%"
+height = "30%"
 command = ["scripts/chooser.sh"]
+
+[[panes]]
+id = "setup-confirm"
+title = "Herdbake setup"
+placement = "popup"
+width = "72%"
+height = "35%"
+command = ["scripts/setup-confirm.sh"]
+
+[[panes]]
+id = "prompt"
+title = "Herdbake"
+placement = "popup"
+width = "72%"
+height = "40%"
+command = ["scripts/prompt.sh"]
+
+[[panes]]
+id = "help"
+title = "Herdbake command center"
+placement = "popup"
+width = "88%"
+height = "82%"
+command = ["scripts/help.py"]

@@ -13,26 +13,17 @@
 name = "menuconfig"
 match = "* Configuration"
 placement = "popup"
-width = "80%"
-height = "80%"
 
 [[rule]]
 name = "devshell"
 match = "OpenEmbedded Developer*Shell"
-placement = "split"
-direction = "down"
-prompt_direction = false
+placement = "popup"
 
 [[rule]]
 name = "ccmake"
 match = "* - ccmake"
-placement = "split"
-direction = "right"
-prompt_direction = true
-prompt_timeout_ms = 15000
+placement = "popup"
 
 # Anything that doesn't match a rule above falls back to this.
 [default]
-placement = "split"
-direction = "down"
-prompt_direction = false
+placement = "popup"
