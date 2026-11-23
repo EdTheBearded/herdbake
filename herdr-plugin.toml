@@ -5,6 +5,12 @@ min_herdr_version = "0.9.0"
 description = "Routes BitBake terminal spawns into compact Herdr popups instead of external terminal windows."
 platforms = ["linux", "macos"]
 
+# The build monitor is a detached /proc watcher (Linux only). Startup hooks are
+# one-shot, so this starts it in the background and returns.
+[[startup]]
+platforms = ["linux"]
+command = ["python3", "scripts/build-monitor.py", "ensure-daemon"]
+
 [[actions]]
 id = "setup"
 title = "Herdbake: set up BitBake terminal routing"
@@ -59,6 +65,13 @@ title = "Herdbake: kernel configuration workflow"
 contexts = ["workspace"]
 command = ["scripts/kernel-workflow-action.sh"]
 
+[[actions]]
+id = "monitor"
+title = "Herdbake: show running builds"
+contexts = ["workspace"]
+platforms = ["linux"]
+command = ["scripts/monitor-action.sh"]
+
 [[panes]]
 id = "terminal"
 title = "Herdbake"
@@ -98,3 +111,12 @@ placement = "popup"
 width = "88%"
 height = "82%"
 command = ["scripts/help.py"]
+
+[[panes]]
+id = "monitor"
+title = "Herdbake: BitBake builds"
+placement = "popup"
+platforms = ["linux"]
+width = "90%"
+height = "60%"
+command = ["python3", "scripts/build-monitor.py", "list-tui"]

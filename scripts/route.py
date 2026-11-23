@@ -162,6 +162,8 @@ def open_pane(title, command, rule):
         # Keep completed interactive terminals visible until the user dismisses
         # them, so menuconfig output and follow-up controls do not vanish.
         "--env", "HERDBAKE_KEEP_OPEN=1",
+        # Lets the build monitor name what BitBake is waiting on.
+        "--env", "HERDBAKE_TITLE=%s" % title,
         "--env", "HERDR_PLUGIN_ROOT=%s" % root,
         "--cwd", build_dir(),
         "--focus",

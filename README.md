@@ -94,6 +94,7 @@ also available from Herdr's command palette or as
 | `prefix+alt+shift+f` | `logs` | open the newest cooker or task log in a scrollable viewer |
 | `prefix+alt+shift+k` | `kernel` | run kernel `menuconfig`, then optionally and separately confirm `savedefconfig` |
 | `prefix+alt+m` | `help` | open the modal command center and see your live shortcuts |
+| `prefix+shift+b` | `monitor` | list running and recent BitBake builds across all panes (Linux) |
 
 The table shows the recommended non-conflicting bindings for Herdr's standard
 `prefix` leader. You can change them in Herdr's `config.toml`; the command
@@ -137,6 +138,49 @@ bindings appear automatically.
   target, then offers an explicit, separately confirmed `savedefconfig` and
   lists generated `defconfig` files. Interactive terminal panes remain open
   after their commands finish until dismissed.
+
+### Build monitor (Linux)
+
+A small background watcher, started by Herdbake's startup hook, follows every
+running `bitbake` and reports it in Herdr:
+
+- **Plain shell pane** - the pane shows up in the Agents sidebar as
+  **bitbake** with Herdr's usual working/done states and a label such as
+  `⚙ 63% task 452/8961 · zlib-native:do_compile`. Before tasks start, the
+  label follows BitBake's own footer (`85% parsing recipes`).
+- **Pane owned by a coding agent** (Claude Code, Codex, Hermes, ...) - the
+  agent keeps its own state; the build progress goes to an `hb_build` token.
+  Builds are tagged with the agent that launched them, from the process tree
+  or the `AI_AGENT` environment variable.
+- **Waiting on you** - while a routed `menuconfig`/`devshell` popup for the
+  same build directory is still open, the build is reported as *blocked*
+  (`⏸ waiting for you in menuconfig`) instead of looking stuck at a task.
+- **Builds started from Herdbake popups** (graph, kernel workflow, ...) are
+  credited to the pane the action was invoked from.
+- **End of build** - `✔ succeeded 53s · 148 tasks`, `✖ FAILED · 2 err`, or
+  `✖ interrupted` (Ctrl-C), plus a Herdr notification. The result stays for
+  15 minutes.
+
+`herdr plugin action invoke herdbake.monitor` (suggested binding
+`prefix+shift+b`) opens a popup listing running and recent builds with their
+workspace › tab › pane; `1`-`9` jumps to the pane, `l` opens the cooker log,
+`s` starts/stops the watcher, and `b` adds the progress row to the sidebar:
+
+```toml
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", "agent"],
+  [{ token = "$hb_build", fg = "#f9e2af" }],
+  ["workspace", "tab"],
+]
+```
+
+Progress comes from `<BUILDDIR>/tmp*/log/cooker/<machine>/<timestamp>.log`
+(`Running [setscene ]task N of M`); nothing is added to the build
+configuration. Debug with `python3 scripts/build-monitor.py scan`; the watcher
+log and state live in `$HERDR_PLUGIN_STATE_DIR/monitor/`. Polling interval and
+result hold time can be tuned with `HERDBAKE_MONITOR_POLL_S` and `HERDBAKE_MONITOR_HOLD_S`.
+Builds started outside Herdr are listed in the popup only.
 
 ## Configuration
 
