@@ -52,6 +52,7 @@ herdbake_open_terminal() {
     --env "HERDBAKE_CMD=$wrapped" \
     --env "HERDBAKE_KEEP_OPEN=$keep_open" \
     --env "HERDBAKE_TITLE=$title" \
+    --env "HERDBAKE_ORIGIN_PANE=${HERDR_PANE_ID:-}" \
     --focus \
     >/dev/null
 }
