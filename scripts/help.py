@@ -17,6 +17,7 @@ GROUPS = (
     ("DEBUG & INSPECT", ("logs", "failure-console", "layers")),
     ("BUILD WORKFLOWS", ("kernel", "graph")),
     ("BUILD HEALTH", ("health",)),
+    ("BUILD MONITOR", ("monitor",)),
 )
 
 

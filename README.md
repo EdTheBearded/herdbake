@@ -94,6 +94,7 @@ also available from Herdr's command palette or as
 | `prefix+alt+shift+f` | `logs` | open the newest cooker or task log in a scrollable viewer |
 | `prefix+alt+shift+k` | `kernel` | run kernel `menuconfig`, then optionally and separately confirm `savedefconfig` |
 | `prefix+alt+m` | `help` | open the modal command center and see your live shortcuts |
+| `prefix+shift+b` | `monitor` | list running and recent BitBake builds across all panes (Linux) |
 
 The table shows the recommended non-conflicting bindings for Herdr's standard
 `prefix` leader. You can change them in Herdr's `config.toml`; the command
@@ -137,6 +138,75 @@ bindings appear automatically.
   target, then offers an explicit, separately confirmed `savedefconfig` and
   lists generated `defconfig` files. Interactive terminal panes remain open
   after their commands finish until dismissed.
+
+### Build monitor (Linux)
+
+A small background watcher, started by Herdbake's startup hook, follows every
+`bitbake` you run (other users' builds on a shared host are ignored) and
+reports it in Herdr:
+
+- **Plain shell pane** - the pane shows up in the Agents sidebar as
+  **bitbake** with Herdr's usual working/done states and a label such as
+  `⚙ 63% task 452/8961 · zlib-native:do_compile`. Before tasks start, the
+  label follows BitBake's own footer (`85% parsing recipes`).
+- **Pane owned by a coding agent** (Claude Code, Codex, Hermes, ...) - the
+  agent keeps its own state; the build progress goes to an `hb_build` token.
+  Builds are tagged with the agent that launched them, from the process tree
+  or the `AI_AGENT` environment variable.
+- **Waiting on you** - while a `menuconfig`/`devshell` terminal that Herdbake
+  routed for the same build directory is still open, the build is reported as
+  *blocked* (`⏸ waiting for you in menuconfig`) instead of looking stuck at a
+  task. Other Herdbake popups (log viewer, doctor, ...) don't count.
+- **Builds started from Herdbake popups** (graph, kernel workflow, ...) are
+  credited to the pane the action was invoked from.
+- **End of build** - `✔ succeeded 53s · 148 tasks`, `✖ FAILED · 2 err`, or
+  `✖ interrupted` (Ctrl-C), plus a Herdr notification; the result stays on the
+  pane for 15 minutes. Runs that execute no tasks (`bitbake -e`, `-p`, `-s`,
+  `-g`) end as a quiet `■ finished`, without a notification.
+
+`herdr plugin action invoke herdbake.monitor` (suggested binding
+`prefix+shift+b`) opens a popup listing running and recent builds with their
+workspace › tab › pane. Select a build with `↑`/`↓` (or `j`/`k`), `Enter` jumps
+to its pane, `l` opens its cooker log, `s` stops or starts the watcher, and `b`
+adds the progress row below to your sidebar. The sidebar row is only added when
+you press `b`; Herdbake never edits Herdr's config on its own. The new config
+is validated with `herdr config check` before it replaces the old one, and the
+previous version is kept as `config.toml.bak-herdbake`.
+
+```toml
+[ui.sidebar.agents]
+rows = [
+  ["state_icon", "agent"],
+  [{ token = "$hb_build", fg = "#f9e2af" }],
+  ["workspace", "tab"],
+]
+```
+
+**Turning it off.** Stopping the watcher with `s` in the popup also disables
+it, so it stays off after Herdr restarts until you press `s` again. This writes
+`monitor.disabled` to the plugin config directory
+(`herdr plugin config-dir herdbake`); deleting that file re-enables it.
+Alternatively, start Herdr with `HERDBAKE_MONITOR=0` in its environment.
+
+**Details.** Progress comes from
+`<BUILDDIR>/tmp*/log/cooker/<machine>/<timestamp>.log`
+(`Running [setscene ]task N of M`); nothing is added to the build
+configuration. Debug with `python3 scripts/build-monitor.py scan`; the watcher
+log and state live in `$HERDR_PLUGIN_STATE_DIR/monitor/`. Polling interval and
+result hold time can be tuned with `HERDBAKE_MONITOR_POLL_S` and
+`HERDBAKE_MONITOR_HOLD_S`. After a Herdbake update, the next startup or
+`monitor` action restarts the watcher with the new code.
+
+**Limitations.**
+- Builds started outside Herdr are listed in the popup only: no sidebar entry
+  and no notification.
+- Builds that run inside a container (CROPS, the Torizon build container, ...)
+  are not linked to a pane. Their processes are re-parented under the
+  container runtime, so the parent chain never reaches the pane's shell, and
+  `BUILDDIR` is a path inside the container, so the cooker log isn't found on
+  the host.
+- A `TMPDIR` outside the build directory hides the cooker log; such builds
+  only show BitBake's on-screen footer until tasks start.
 
 ## Configuration
 

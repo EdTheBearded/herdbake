@@ -166,7 +166,7 @@ panes = {pane['id']: pane for pane in data['panes']}
 assert panes and all(pane['placement'] == 'popup' for pane in panes.values())
 assert {action['id'] for action in data['actions']} == {
     'setup', 'help', 'doctor', 'failure-console', 'layers', 'health', 'graph',
-    'logs', 'kernel',
+    'logs', 'kernel', 'monitor',
 }
 
 # Registered actions only open declared popup entrypoints or delegate to the
